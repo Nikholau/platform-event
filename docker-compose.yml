@@ -1,0 +1,45 @@
+version: '3.8'
+services:
+  # db mysql
+  db:
+    container_name: mysql
+    image: mysql:5.7.22
+    restart: unless-stopped
+    environment:
+        MYSQL_DATABASE: ${DB_DATABASE}
+        MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+        MYSQL_PASSWORD: ${DB_PASSWORD}
+        MYSQL_USER: ${DB_USERNAME}
+    volumes:
+        - ./database/SQLProjetoLab.sql:/docker-entrypoint-initdb.d/SQLProjetoLab.sql
+    ports:
+        - "3388:3306"
+    networks:
+        - labProg
+
+  nginx:
+    container_name: nginx
+    image: nginx:latest
+    restart: always
+    ports:
+      - 9090:80
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - labProg 
+
+  php:
+    container_name: php
+    image: docker_compose_php
+    build: ./
+    command: php -S 0.0.0.0:80
+    restart: always
+    ports:
+      - 9999:80
+    volumes:
+      - ./:/usr/src/myapp
+    networks:
+      - labProg  
+
+networks:
+  labProg:
