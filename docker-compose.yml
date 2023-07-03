@@ -17,29 +17,18 @@ services:
     networks:
         - labProg
 
-  nginx:
-    container_name: nginx
-    image: nginx:latest
-    restart: always
-    ports:
-      - 9090:80
-    volumes:
-      - ./:/var/www/html
-    networks:
-      - labProg 
-
   php:
     container_name: php
-    image: docker_compose_php
-    build: ./
-    command: php -S 0.0.0.0:80
+    image: webdevops/php-nginx
     restart: always
     ports:
       - 9999:80
     volumes:
-      - ./:/usr/src/myapp
+      - .:/app
     networks:
-      - labProg  
+      - labProg
+    depends_on: 
+      - db  
 
 networks:
   labProg:

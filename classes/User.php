@@ -57,10 +57,9 @@ class User {
     public function save() {
         $conn = getConnection();
         $stmt = $conn->prepare("INSERT INTO users (name, email, password, user_type) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssss", $this->name, $this->email, $this->password, $this->userType);
+        $stmt->bind_param("ssss", $this->name, strtolower($this->email), password_hash($this->password, PASSWORD_BCRYPT), $this->userType);
         $stmt->execute();
         $this->id = $stmt->insert_id;
-        $stmt->close();
         $conn->close();
     }
 

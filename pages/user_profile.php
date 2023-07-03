@@ -13,12 +13,12 @@ $user = $_SESSION['user'];
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Event Management System - User Profile</title>
+    <title>Platform Event System - User Profile</title>
     <link rel="stylesheet" type="text/css" href="../css/style.css">
 </head>
 <body>
     <header>
-        <h1>Event Management System</h1>
+        <h1>Platform Event System</h1>
     </header>
     
     <nav>
@@ -40,7 +40,7 @@ $user = $_SESSION['user'];
     </section>
     
     <footer>
-        <p>&copy; 2023 Event Management System. All rights reserved.</p>
+        <p>&copy; 2023 Platform Event System. All rights reserved.</p>
     </footer>
 </body>
 </html>

@@ -91,12 +91,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Event Management System - Add Event</title>
+    <title>Platform Event System - Add Event</title>
     <link rel="stylesheet" type="text/css" href="../css/add_event.css">
 </head>
 <body>
     <header>
-        <h1>Event Management System</h1>
+        <h1>Platform Event System</h1>
     </header>
     
     <nav>

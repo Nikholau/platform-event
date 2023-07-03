@@ -26,12 +26,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Event Management System - User Login</title>
+    <title>Platform Event System - User Login</title>
     <link rel="stylesheet" type="text/css" href="../css/style.css">
 </head>
 <body>
     <header>
-        <h1>Event Management System</h1>
+        <h1>Platform Event System</h1>
     </header>
     
     <nav>
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </section>
     
     <footer>
-        <p>&copy; 2023 Event Management System. All rights reserved.</p>
+        <p>&copy; 2023 Platform Event System. All rights reserved.</p>
     </footer>
 </body>
 </html>
