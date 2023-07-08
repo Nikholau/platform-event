@@ -2,34 +2,30 @@
 session_start();
 
 require_once '../classes/User.php';
-require_once '../classes/Event.php';
+
+if (!isset($_SESSION['user']) || (unserialize($_SESSION['user'])->getUserType() !== 'admin' && unserialize($_SESSION['user'])->getUserType() !== 'grant_admin')) {
+    header('Location: ../services/unauthorized.php');
+    exit();
+}
 
 $user = null;
 if (isset($_SESSION['user'])) {
     $user = unserialize($_SESSION['user']);
 }
 
-$events = Event::getAll();
-
-if (isset($_GET['query'])) {
-    $query = $_GET['query'];
-
-    $events = Event::searchEvent($query);
-}
 ?>
 
 <!DOCTYPE html>
 <html>
 
 <head>
-    <title>Home</title>
-    <link rel="stylesheet" type="text/css" href="../css/index.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <title>Event List</title>
+    <link rel="stylesheet" href="../css/eventList.css">
 </head>
 
 <body>
     <header>
-        <h1>Platform Event</h1>
+        <h1></h1>
         <nav>
             <ul>
                 <li><a href="./index.php"><img class="home-page" src="../assets/home.png" title="Home"></a></li>
@@ -50,40 +46,49 @@ if (isset($_GET['query'])) {
         </nav>
     </header>
 
-    <div class="subheader">
-        <div class="title">
-            <h2>Principais eventos</h2>
-        </div>
-
-        <form class="search-form-2" action="index.php" method="GET">
-            <input class="space-form-text-2" type="text" name="query" placeholder="Search events"
-                value="<?php echo isset($_GET['query']) ? $_GET['query'] : ''; ?>">
-            <button class="btn-search" type="submit"><i class="fas fa-search"></i></button>
-        </form>
-    </div>
-
-    <div class="eventos-geral">
-        <br>
+    <section class="event-list">
         <?php
+        require_once __DIR__ . '/../database/connection.php';
+        require_once '../classes/Event.php';
+
+        // Verificar se a barra de pesquisa foi submetida
+        if (isset($_GET['search'])) {
+            $search = $_GET['search'];
+            $events = Event::searchEvent($search);
+        } else {
+            $events = Event::getAll();
+        }
+        echo "<h2 class='reviewtext'>Event List</h2>";
+        echo "<div class='search-bar'>";
+        echo "<form action='eventList.php' method='GET'>";
+        echo "<input type='text' name='search' placeholder='Search event'>";
+        echo "<button class='btn-search' type='submit'>Search</button>";
+        echo "</form>";
+        echo "</div>";
+
         if (!empty($events)) {
+
+            echo "<div class='event-container'>";
+
             foreach ($events as $event) {
                 $eventId = $event->getId();
-                $eventDetailsUrl = "eventDetails.php?id=$eventId";
+                $eventTitle = $event->getTitle();
+                $eventImage = $event->getImages();
 
-                echo "<a href='$eventDetailsUrl' class='event'>";
-                echo "<h3>" . $event->getTitle() . "</h3>";
-                echo "<img class='image-teste' src='" . $event->getImages() . "' alt=''>";
-                echo "<p>" . $event->getDescription() . "</p>";
-                echo "<p>Date: " . $event->getDate() . "</p>";
-                echo "<p>Time: " . $event->getTime() . "</p>";
-                echo "<p>Location: " . $event->getLocation() . "</p>";
+                echo "<div class='event'>";
+                echo "<a href='./edit.php?id={$eventId}'>";
+                echo "<h3>{$eventTitle}</h3>";
+                echo "<img src='{$eventImage}' alt='Event Image'>";
                 echo "</a>";
+                echo "</div>";
             }
+
+            echo "</div>";
         } else {
             echo "<p>No events found.</p>";
         }
         ?>
-    </div>
+    </section>
 </body>
 
 </html>

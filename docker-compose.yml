@@ -11,24 +11,25 @@ services:
         MYSQL_PASSWORD: ${DB_PASSWORD}
         MYSQL_USER: ${DB_USERNAME}
     volumes:
-        - ./database/SQLProjetoLab.sql:/docker-entrypoint-initdb.d/SQLProjetoLab.sql
+        - ./data/initialData.sql:/docker-entrypoint-initdb.d/SQLProjetoLab.sql
     ports:
         - "3388:3306"
     networks:
-        - labProg
+        - platformEvent
 
   php:
     container_name: php
-    image: webdevops/php-nginx
-    restart: always
+    image: wyveo/nginx-php-fpm:php81
     ports:
-      - 9999:80
+      - 80:80
     volumes:
-      - .:/app
+      - .:/var/www/html/app
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+    restart: always
     networks:
-      - labProg
+      - platformEvent
     depends_on: 
       - db  
 
 networks:
-  labProg:
+  platformEvent:

@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../database/connection.php';
+require_once __DIR__ . '/../data/connection.php';
 
 class Event {
     private $id;
@@ -11,8 +11,9 @@ class Event {
     private $categoryId;
     private $price;
     private $images;
+    private $paymentStatus;
 
-    public function __construct($id ,$title, $description, $date, $time, $location, $categoryId, $price, $images) {
+    public function __construct($id, $title, $description, $date, $time, $location, $categoryId, $price, $images) {
         $this->id = $id;
         $this->title = $title;
         $this->description = $description;
@@ -61,6 +62,10 @@ class Event {
         return $this->images;
     }
 
+    public function getPaymentStatus() {
+        return $this->paymentStatus;
+    }
+
     // Setters
 
     public function setId($id) {
@@ -99,17 +104,36 @@ class Event {
         $this->images = $images;
     }
 
+    public function setPaymentStatus($paymentStatus) {
+        $this->paymentStatus = $paymentStatus;
+    }
+
     // Database interaction methods
     public function save() {
         $conn = getConnection();
-        $stmt = $conn->prepare("INSERT INTO events (title, description, date, time, location, category_id, price, images) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssssisS", $this->title, $this->description, $this->date, $this->time, $this->location, $this->categoryId, $this->price, $this->images);
+    
+        if ($this->id) {
+            // Atualizar evento existente
+            $stmt = $conn->prepare("UPDATE events SET title = ?, description = ?, date = ?, time = ?, location = ?, category_id = ?, price = ?, images = ? WHERE id = ?");
+            $stmt->bind_param("ssssssdsi", $this->title, $this->description, $this->date, $this->time, $this->location, $this->categoryId, $this->price, $this->images, $this->id);
+        } else {
+            // Inserir novo evento
+            $stmt = $conn->prepare("INSERT INTO events (title, description, date, time, location, category_id, price, images) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssssssds", $this->title, $this->description, $this->date, $this->time, $this->location, $this->categoryId, $this->price, $this->images);
+        }
+    
         $stmt->execute();
-        $this->id = $stmt->insert_id;
+    
+        // Se for uma inserção, definir o ID do evento
+        if (!$this->id) {
+            $this->id = $stmt->insert_id;
+        }
+    
         $stmt->close();
         $conn->close();
     }
-
+    
+    
     public static function getById($id) {
         $conn = getConnection();
         $stmt = $conn->prepare("SELECT * FROM events WHERE id = ?");
@@ -119,7 +143,7 @@ class Event {
         $event = $result->fetch_assoc();
         $stmt->close();
         $conn->close();
-        return $event ? new Event($event['id'],$event['title'], $event['description'], $event['date'], $event['time'], $event['location'], $event['category_id'], $event['price'], $event['images']) : null;
+        return $event ? new Event($event['id'], $event['title'], $event['description'], $event['date'], $event['time'], $event['location'], $event['category_id'], $event['price'], $event['images']) : null;
     }
 
     public static function getAll() {
@@ -129,11 +153,54 @@ class Event {
         $result = $stmt->get_result();
         $events = [];
         while ($event = $result->fetch_assoc()) {
-            $events[] = new Event($event['id'] ,$event['title'], $event['description'], $event['date'], $event['time'], $event['location'], $event['category_id'], $event['price'], $event['images']);
+            $events[] = new Event($event['id'], $event['title'], $event['description'], $event['date'], $event['time'], $event['location'], $event['category_id'], $event['price'], $event['images']);
         }
         $stmt->close();
         $conn->close();
         return $events;
     }
+
+    public static function getEventByCategory($categoryId) {
+        $conn = getConnection();
+        $stmt = $conn->prepare("SELECT id, title, description, date, time, location, category_id, price, images FROM events WHERE category_id = ?");
+        $stmt->bind_param("i", $categoryId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $events = [];
+        while ($event = $result->fetch_assoc()) {
+            $events[] = $event;
+        }
+        $stmt->close();
+        $conn->close();
+        return $events;
+    }
+
+    public static function deleteById($id) {
+        // Excluir registros de inscrição relacionados ao evento
+        Registration::deleteById($id);
+
+        $conn = getConnection();
+        $stmt = $conn->prepare("DELETE FROM events WHERE id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $stmt->close();
+        $conn->close();
+    }
+
+    public static function searchEvent($query) {
+        $conn = getConnection();
+        $stmt = $conn->prepare("SELECT * FROM events WHERE title LIKE ?");
+        $searchQuery = "%" . $query . "%";
+        $stmt->bind_param("s", $searchQuery);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $events = [];
+        while ($event = $result->fetch_assoc()) {
+            $events[] = new Event($event['id'], $event['title'], $event['description'], $event['date'], $event['time'], $event['location'], $event['category_id'], $event['price'], $event['images']);
+        }
+        $stmt->close();
+        $conn->close();
+        return $events;
+    }
+    
 }
-?>
