@@ -1,11 +1,8 @@
 <?php
 session_start();
-ini_set('display_errors', 1);
 
-// require_once './classes/User.php';
-// require_once './classes/Event.php';
-require_once __DIR__ . '/classes/User.php';
-require_once __DIR__ . '/classes/Event.php';
+require_once './src/class/User.php';
+require_once './src/class/Event.php';
 
 $user = null;
 if (isset($_SESSION['user'])) {
@@ -26,7 +23,7 @@ if (isset($_GET['query'])) {
 
 <head>
     <title>Home</title>
-    <link rel="stylesheet" type="text/css" href="./css/index.css">
+    <link rel="stylesheet" type="text/css" href="../css/index.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 
@@ -35,19 +32,19 @@ if (isset($_GET['query'])) {
         <h1>Platform Event</h1>
         <nav>
             <ul>
-                <li><a href="./index.php"><img class="home-page" src="./assets/home.png" title="Home"></a></li>
+                <li><a href="./index.php"><img class="home-page" src="../assets/home.png" title="Home"></a></li>
                 <?php if ($user instanceof User && ($user->getUserType() === 'admin' || $user->getUserType() === 'grant_admin')): ?>
-                    <li><a class="register-event" href="./pages/addEvent.php">Add Event</a></li>
+                    <li><a class="register-event" href="../pages/addEvent.php">Add Event</a></li>
                 <?php endif; ?>
                 <?php if ($user instanceof User): ?>
-                    <li><a class="register-event" href="./pages/processRegistration.php">Registrar evento</a></li>
-                    <li><a href="./pages/profileUser.php"><img class="perfil-img" src="./assets/perfil.png"
+                    <li><a class="register-event" href="../pages/processRegistration.php">Registrar evento</a></li>
+                    <li><a href="../pages/profileUser.php"><img class="perfil-img" src="../assets/perfil.png"
                                 title="Profile"></a>
                     </li>
-                    <li><a href="./services/logout.php"><img class="leave-img" src="./assets/sair.png"
+                    <li><a href="../services/logout.php"><img class="leave-img" src="../assets/sair.png"
                                 title="SignOut"></a></li>
                 <?php else: ?>
-                    <li><a href="./pages/login">Login</a></li>
+                    <li><a href="../pages/loginUser.php">Login</a></li>
                 <?php endif; ?>
             </ul>
         </nav>
