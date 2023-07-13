@@ -1,2 +1,4 @@
 env
-mysql/ca-key.pem
+mysql
+docker
+
